@@ -18,8 +18,7 @@ class _ImageInputState extends State<ImageInput> {
   File _storedImage;
 
   Future<void> _takePicture() async {
-    final picker = ImagePicker();
-    final imageFile = await picker.getImage(
+    final imageFile = await ImagePicker.pickImage(
       source: ImageSource.camera,
       maxWidth: 600,
     );
@@ -27,28 +26,23 @@ class _ImageInputState extends State<ImageInput> {
       return;
     }
     setState(() {
-      _storedImage = File(imageFile.path);
+      _storedImage = imageFile;
     });
     final appDir = await syspaths.getApplicationDocumentsDirectory();
     final fileName = path.basename(imageFile.path);
-    final savedImage =
-        await File(imageFile.path).copy('${appDir.path}/$fileName');
+    final savedImage = await imageFile.copy('${appDir.path}/$fileName');
     widget.onSelectImage(savedImage);
-    // final imageFile = await ImagePicker.pickImage();
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
+      children: <Widget>[
         Container(
           width: 150,
           height: 100,
           decoration: BoxDecoration(
-            border: Border.all(
-              width: 1,
-              color: Colors.grey,
-            ),
+            border: Border.all(width: 1, color: Colors.grey),
           ),
           child: _storedImage != null
               ? Image.file(
@@ -57,7 +51,7 @@ class _ImageInputState extends State<ImageInput> {
                   width: double.infinity,
                 )
               : Text(
-                  'No image',
+                  'No Image Taken',
                   textAlign: TextAlign.center,
                 ),
           alignment: Alignment.center,
@@ -68,7 +62,7 @@ class _ImageInputState extends State<ImageInput> {
         Expanded(
           child: FlatButton.icon(
             icon: Icon(Icons.camera),
-            label: Text('Take picture'),
+            label: Text('Take Picture'),
             textColor: Theme.of(context).primaryColor,
             onPressed: _takePicture,
           ),
